@@ -780,25 +780,25 @@ function startFinalExplosion() {
     const rot = (Math.random() - 0.5) * 120;
 
     img.style.transform = `translate3d(${initX}px, ${initY}px, 0) scale(0.1) rotate(${rot}deg)`;
-    img.style.setProperty('--rot', \`\${rot}deg\`);
-    
+    img.style.setProperty('--rot', `${rot}deg`);
+
     collage.appendChild(img);
     pieces.push(img);
   });
-  
+
   // Stage 6.1: Fly inwards to form the collage
   setTimeout(() => {
     pieces.forEach((img, i) => {
       const col = i % cols;
       const row = Math.floor(i / cols);
-      
-      const targetX = startX + (col * (cw + 10)) - (w/2) + cw/2;
-      const targetY = startY + (row * (ch + 10)) - (h/2) + ch/2;
-      
+
+      const targetX = startX + (col * (cw + 10)) - (w / 2) + cw / 2;
+      const targetY = startY + (row * (ch + 10)) - (h / 2) + ch / 2;
+
       // Slight random wobble for realism
       const finalRot = (Math.random() - 0.5) * 15;
-      
-      img.style.transform = `translate3d(${ targetX }px, ${ targetY }px, 0) scale(1) rotate(${ finalRot }deg)`;
+
+      img.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) scale(1) rotate(${finalRot}deg)`;
       img.style.opacity = '1';
     });
   }, 100);
@@ -810,11 +810,11 @@ function startFinalExplosion() {
       const dist = Math.max(w, h) * 1.5; // push far past screen edge
       const exX = Math.cos(angle) * dist;
       const exY = Math.sin(angle) * dist;
-      
-      img.style.transform = `translate3d(${ exX }px, ${ exY }px, 0) scale(2) rotate(${ Math.random() * 360 }deg)`;
+
+      img.style.transform = `translate3d(${exX}px, ${exY}px, 0) scale(2) rotate(${Math.random() * 360}deg)`;
       img.classList.add('exploded');
     });
-    
+
     const ft = document.getElementById('absoluteFinaleText');
     ft.style.display = 'block';
     // Force reflow
@@ -838,7 +838,7 @@ function replay() {
   const gb = document.getElementById('giftBox'); if (gb) gb.style.display = '';
   document.getElementById('giftLid').classList.remove('open'); document.getElementById('giftBeams').classList.remove('show'); document.getElementById('giftText').style.display = '';
   document.getElementById('letterCard').classList.remove('show'); document.getElementById('finaleTitle').classList.remove('show'); document.getElementById('finaleSub').classList.remove('show'); document.getElementById('btnContinue').classList.remove('show'); document.getElementById('btnWishContinue').classList.remove('show');
-  
+
   const ft = document.getElementById('absoluteFinaleText');
   ft.style.opacity = '0';
   setTimeout(() => ft.style.display = 'none', 500);
