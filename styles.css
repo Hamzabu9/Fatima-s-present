@@ -1250,3 +1250,56 @@ body.theme-dark .letter-card {
     font-size: 0.55rem;
   }
 }
+
+/* ═══════════════════════
+   STAGE 6 — FINALE EXPLOSION
+   ═══════════════════════ */
+#stage6 {
+  z-index: 50;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2s;
+}
+
+#stage6.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.final-collage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.collage-piece {
+  position: absolute;
+  width: clamp(60px, 12vw, 100px);
+  height: clamp(80px, 16vw, 130px);
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: all 1.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  opacity: 0;
+  transform: scale(0.1) translate3d(0, 0, 0) rotate(var(--rot, 0deg));
+}
+
+.collage-piece.exploded {
+  transition: all 2.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+  opacity: 0 !important;
+  filter: blur(8px);
+}
+
+#absoluteFinaleText {
+  position: absolute;
+  z-index: 60;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 100%;
+}

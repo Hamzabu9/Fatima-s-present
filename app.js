@@ -629,8 +629,19 @@ function startSparkler() {
    STAGE 5 — FINALE
    ═══════════════════════════ */
 function goStage5() {
-  document.getElementById('stage5').classList.add('active'); document.getElementById('btnReplay').style.display = 'block';
-  setTimeout(() => { startFireworks(); buildDancer(); spawnFinaleHearts(); startFinaleLayer(); setTimeout(() => document.getElementById('finaleTitle').classList.add('show'), 400); setTimeout(() => document.getElementById('finaleSub').classList.add('show'), 1000); }, 400);
+  document.getElementById('stage5').classList.add('active');
+
+  setTimeout(() => {
+    startFireworks();
+    buildDancer();
+    spawnFinaleHearts();
+    startFinaleLayer();
+    setTimeout(() => document.getElementById('finaleTitle').classList.add('show'), 400);
+    setTimeout(() => document.getElementById('finaleSub').classList.add('show'), 1000);
+
+    // Trigger Final Explosion after 7 seconds of looking at Stage 5
+    setTimeout(goStage6, 7000);
+  }, 400);
 }
 const fwCanvas = document.getElementById('fireworksCanvas'); const fwCtx = fwCanvas.getContext('2d'); let fireworks = [], fwSparks = [], fwRunning = false;
 function startFireworks() { fwCanvas.width = innerWidth; fwCanvas.height = innerHeight; fwRunning = true; launchFW(); requestAnimationFrame(fwLoop); }
@@ -705,6 +716,100 @@ function spawnFinaleHearts() {
 }
 
 /* ═══════════════════════════
+   STAGE 6 — ALL IMAGES EXPLOSION
+   ═══════════════════════════ */
+function goStage6() {
+  const s5 = document.getElementById('stage5');
+  s5.style.transition = 'opacity 1.5s';
+  s5.style.opacity = '0';
+
+  setTimeout(() => {
+    s5.classList.remove('active');
+    s5.style.opacity = '';
+    document.getElementById('stage6').classList.add('active');
+    startFinalExplosion();
+  }, 1500);
+}
+
+function startFinalExplosion() {
+  const collage = document.getElementById('finalCollage');
+  collage.innerHTML = '';
+
+  // Create all 15 images in a clustered grid pattern
+  const pieces = [];
+  const cols = 5;
+  const rows = 3;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const cw = Math.min(w * 0.12, 100);
+  const ch = Math.min(w * 0.16, 130);
+
+  // Calculate center offsets
+  const startX = (w - (cols * cw)) / 2;
+  const startY = (h - (rows * ch)) / 2;
+
+  imageFiles.forEach((src, i) => {
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'collage-piece';
+
+    // Initial random placement far off screen
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.max(w, h);
+    const initX = Math.cos(angle) * dist;
+    const initY = Math.sin(angle) * dist;
+    const rot = (Math.random() - 0.5) * 120;
+
+    img.style.transform = `translate3d(${initX}px, ${initY}px, 0) scale(0.1) rotate(${rot}deg)`;
+    img.style.setProperty('--rot', \`\${rot}deg\`);
+    
+    collage.appendChild(img);
+    pieces.push(img);
+  });
+  
+  // Stage 6.1: Fly inwards to form the collage
+  setTimeout(() => {
+    pieces.forEach((img, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      
+      const targetX = startX + (col * (cw + 10)) - (w/2) + cw/2;
+      const targetY = startY + (row * (ch + 10)) - (h/2) + ch/2;
+      
+      // Slight random wobble for realism
+      const finalRot = (Math.random() - 0.5) * 15;
+      
+      img.style.transform = `translate3d(${ targetX }px, ${ targetY }px, 0) scale(1) rotate(${ finalRot }deg)`;
+      img.style.opacity = '1';
+    });
+  }, 100);
+
+  // Stage 6.2: Explode outwards and reveal final text
+  setTimeout(() => {
+    pieces.forEach((img) => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.max(w, h) * 1.5; // push far past screen edge
+      const exX = Math.cos(angle) * dist;
+      const exY = Math.sin(angle) * dist;
+      
+      img.style.transform = `translate3d(${ exX }px, ${ exY }px, 0) scale(2) rotate(${ Math.random() * 360 }deg)`;
+      img.classList.add('exploded');
+    });
+    
+    const ft = document.getElementById('absoluteFinaleText');
+    ft.style.display = 'block';
+    // Force reflow
+    void ft.offsetWidth;
+    ft.style.opacity = '1';
+
+    setTimeout(() => {
+      document.getElementById('btnReplay').style.display = 'block';
+    }, 2000);
+
+  }, 4500); // Wait 4.5 seconds admiring the collage before it drops
+}
+
+/* ═══════════════════════════
    REPLAY
    ═══════════════════════════ */
 function replay() {
@@ -714,6 +819,11 @@ function replay() {
   const gb = document.getElementById('giftBox'); if (gb) gb.style.display = '';
   document.getElementById('giftLid').classList.remove('open'); document.getElementById('giftBeams').classList.remove('show'); document.getElementById('giftText').style.display = '';
   document.getElementById('letterCard').classList.remove('show'); document.getElementById('finaleTitle').classList.remove('show'); document.getElementById('finaleSub').classList.remove('show'); document.getElementById('btnContinue').classList.remove('show'); document.getElementById('btnWishContinue').classList.remove('show');
+  
+  const ft = document.getElementById('absoluteFinaleText');
+  ft.style.opacity = '0';
+  setTimeout(() => ft.style.display = 'none', 500);
+
   document.querySelectorAll('.stage,#wishWall,#sparklerStage,#loveLetter').forEach(s => s.classList.remove('active'));
   document.getElementById('stage1').classList.add('active'); fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height); spawnConfetti();
   if (musicPlaying && !musicMuted && !customAudioPlayer) { clearTimeout(melodyTimeout); playMelody(0.2); }
