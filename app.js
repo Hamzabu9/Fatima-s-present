@@ -359,12 +359,14 @@ const heartColors = [
   ['#FFF', '#A855F7'], ['#FFF', '#34D399']
 ];
 let isLetterOpen = false;
+let specialSpawns = [];
 
 function startHeartGame() {
   gc.width = innerWidth; gc.height = innerHeight;
   heartsCaught = 0; gameHearts = []; particles = []; gameTimer = 60;
   consecutiveHearts = 0; loveLetterShown = false; isLetterOpen = false;
   currentCombo = 0;
+  specialSpawns = [45, 15]; // Spawn the special heart at 45s and 15s remaining
 
   document.getElementById('gameScore').textContent = '♡ 0 / 15';
 
@@ -374,9 +376,27 @@ function startHeartGame() {
     gameTimer--;
     const m = Math.floor(gameTimer / 60), s = gameTimer % 60;
     document.getElementById('gameTimer').textContent = `⏱ ${m}:${s < 10 ? '0' : ''}${s}`;
+
+    if (specialSpawns.includes(gameTimer) && !loveLetterShown) {
+      spawnSpecialHeart();
+    }
+
     if (gameTimer <= 0) { gameRunning = false; clearInterval(gameInterval); allUnlocked = true; endGame(); }
   }, 1000);
   spawnHeartLoop(); requestAnimationFrame(gameLoop);
+}
+
+function spawnSpecialHeart() {
+  if (!gameRunning) return;
+  gameHearts.push({
+    x: Math.random() * (gc.width - 100) + 50, y: -50, size: 38,
+    speed: 2.8 + Math.random() * 1.5,
+    c1: '#FFD700', c2: '#FFA500', // Gold!
+    alpha: 1, shrink: false, missed: false,
+    wobble: Math.random() * Math.PI * 2, wobbleSpeed: 0.035,
+    rotation: Math.random() * 0.3 - 0.15,
+    isSpecial: true
+  });
 }
 
 function spawnHeartLoop() {
@@ -450,11 +470,18 @@ function handleGameClick(e) {
   for (let i = gameHearts.length - 1; i >= 0; i--) {
     const h = gameHearts[i];
     if (!h.shrink && Math.hypot(cx - h.x, cy - h.y) < h.size * 1.5) {
-      heartsCaught++; consecutiveHearts++; currentCombo++;
-
-      if (currentCombo >= 2) showComboText(h.x, h.y, currentCombo);
-      document.getElementById('gameScore').textContent = `♡ ${heartsCaught} / 15`;
-      playChime();
+      if (h.isSpecial && !loveLetterShown) {
+        loveLetterShown = true; isLetterOpen = true;
+        document.getElementById('loveLetter').classList.add('active');
+        spawnRosePetals();
+        typeWriter(document.getElementById('llReveal'), secretLetter, 18);
+        playChime();
+      } else {
+        heartsCaught++; consecutiveHearts++; currentCombo++;
+        if (currentCombo >= 2) showComboText(h.x, h.y, currentCombo);
+        document.getElementById('gameScore').textContent = `♡ ${heartsCaught} / 15`;
+        playChime();
+      }
 
       const cols = ['#FFFFFF', h.c2];
       for (let j = 0; j < 18; j++) {
@@ -466,14 +493,6 @@ function handleGameClick(e) {
         });
       }
       gameHearts.splice(i, 1);
-
-      // Secret love letter — 3 consecutive
-      if (consecutiveHearts >= 3 && !loveLetterShown) {
-        loveLetterShown = true; isLetterOpen = true;
-        document.getElementById('loveLetter').classList.add('active');
-        spawnRosePetals();
-        typeWriter(document.getElementById('llReveal'), secretLetter, 18);
-      }
 
       // Clues
       if (heartsCaught % 3 === 0 && heartsCaught / 3 <= 5) {
