@@ -389,11 +389,11 @@ function startHeartGame() {
 function spawnSpecialHeart() {
   if (!gameRunning) return;
   gameHearts.push({
-    x: Math.random() * (gc.width - 100) + 50, y: -50, size: 38,
-    speed: 2.8 + Math.random() * 1.5,
+    x: Math.random() * (gc.width - 150) + 75, y: -80, size: 80,
+    speed: 1.8 + Math.random() * 0.8,
     c1: '#FFD700', c2: '#FFA500', // Gold!
     alpha: 1, shrink: false, missed: false,
-    wobble: Math.random() * Math.PI * 2, wobbleSpeed: 0.035,
+    wobble: Math.random() * Math.PI * 2, wobbleSpeed: 0.05,
     rotation: Math.random() * 0.3 - 0.15,
     isSpecial: true
   });
@@ -820,6 +820,10 @@ function startFinalExplosion() {
     // Force reflow
     void ft.offsetWidth;
     ft.style.opacity = '1';
+
+    // Special Effects!
+    spawnConfetti(100);
+    spawnFinaleHearts();
 
     setTimeout(() => {
       document.getElementById('btnReplay').style.display = 'block';
