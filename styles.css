@@ -1257,7 +1257,7 @@ body.theme-dark .letter-card {
    ═══════════════════════ */
 #stage6 {
   z-index: 50;
-  background: var(--bg);
+  background: transparent;
   opacity: 0;
   pointer-events: none;
   transition: opacity 2s;
